@@ -21,7 +21,7 @@ pins.each do |pin|
 end
 
 pins.each do |pin|
-  io.write(pin,1)
+  io.write(pin,0)
 end
 
 while true do
