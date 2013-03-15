@@ -25,6 +25,7 @@ pins.each do |pin|
 end
 
 while true do
+  begin
   level = JSON.parse(Faraday.get("https://devconfive.herokuapp.com/index.json").body).map{|b| b["devcon"]}.min
   #level = [1,2,3,4,5].sample
 
@@ -44,4 +45,7 @@ while true do
   end 
   sleep(10)
   puts "done sleeping"
+  rescue Exception => e
+    puts "ERROR: #{e}"
+  end
 end
