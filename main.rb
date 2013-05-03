@@ -21,31 +21,37 @@ pins.each do |pin|
 end
 
 pins.each do |pin|
-  io.write(pin,0)
+  io.write(pin,1)
 end
 
 while true do
   begin
-  level = JSON.parse(Faraday.get("https://devconfive.herokuapp.com/index.json").body).map{|b| b["devcon"]}.min
-  #level = [1,2,3,4,5].sample
+  # level = JSON.parse(Faraday.get("https://devconfive.herokuapp.com/index.json").body).map{|b| b["devcon"]}.min
+  level = [1,2,3,4,5].sample
 
   puts level
 
   pins.each do |pin|
-    io.write(pin,0)
+    io.write(pin,1)
   end
 
   case mapping[level]
   when green
-    io.write(green_pin,1)
+    io.write(green_pin,0)
   when orange
-    io.write(orange_pin,1)
+    io.write(orange_pin,0)
   when red
-    io.write(red_pin,1)
+    io.write(red_pin,0)
   end 
   sleep(10)
   puts "done sleeping"
-  rescue Exception => e
+  rescue StandardError => e
     puts "ERROR: #{e}"
+  rescue Interrupt => i
+    puts "Shutting down"
+    pins.each do |pin|
+      io.write(pin, 1)
+    end
+    raise i
   end
 end
