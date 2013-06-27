@@ -26,8 +26,13 @@ end
 
 while true do
   begin
-  # level = JSON.parse(Faraday.get("https://devconfive.herokuapp.com/index.json").body).map{|b| b["devcon"]}.min
-  level = [1,2,3,4,5].sample
+  conn = Faraday.new(:url => "https://devconfive.herokuapp.com/index.json")
+  response = conn.get do |req|
+    req.options[:timeout] = 5
+    req.options[:open_timeout] = 2 
+  end
+  level = JSON.parse(response.body).map{|b| b["devcon"]}.min
+  #level = [1,2,3,4,5].sample
 
   puts level
 
@@ -47,6 +52,9 @@ while true do
   puts "done sleeping"
   rescue StandardError => e
     puts "ERROR: #{e}"
+    pins.each do |pin|
+      io.write(pin, 1)
+    end
   rescue Interrupt => i
     puts "Shutting down"
     pins.each do |pin|
