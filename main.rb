@@ -24,6 +24,9 @@ pins.each do |pin|
   io.write(pin,1)
 end
 
+errors = 0
+max_errors = 5
+
 while true do
   begin
   conn = Faraday.new(:url => "https://devconfive.herokuapp.com/index.json")
@@ -50,10 +53,14 @@ while true do
   end 
   sleep(10)
   puts "done sleeping"
+  errors = 0
   rescue StandardError => e
     puts "ERROR: #{e}"
-    pins.each do |pin|
-      io.write(pin, 1)
+    errors++
+    if errors > max_errors
+      pins.each do |pin|
+        io.write(pin, 1)
+      end
     end
   rescue Interrupt => i
     puts "Shutting down"
