@@ -29,34 +29,34 @@ max_errors = 5
 
 while true do
   begin
-  conn = Faraday.new(:url => "https://devconfive.herokuapp.com/index.json")
-  response = conn.get do |req|
-    req.options[:timeout] = 5
-    req.options[:open_timeout] = 2 
-  end
-  level = JSON.parse(response.body).map{|b| b["devcon"]}.min
-  #level = [1,2,3,4,5].sample
+    conn = Faraday.new(:url => "https://devconfive.herokuapp.com/index.json")
+    response = conn.get do |req|
+      req.options[:timeout] = 5
+      req.options[:open_timeout] = 2
+    end
+    errors = 0
+    level = JSON.parse(response.body).map{|b| b["devcon"]}.min
+    #level = [1,2,3,4,5].sample
 
-  puts level
+    puts level
 
-  pins.each do |pin|
-    io.write(pin,1)
-  end
+    pins.each do |pin|
+      io.write(pin,1)
+    end
 
-  case mapping[level]
-  when green
-    io.write(green_pin,0)
-  when orange
-    io.write(orange_pin,0)
-  when red
-    io.write(red_pin,0)
-  end 
-  sleep(10)
-  puts "done sleeping"
-  errors = 0
+    case mapping[level]
+    when green
+      io.write(green_pin,0)
+    when orange
+      io.write(orange_pin,0)
+    when red
+      io.write(red_pin,0)
+    end
+    sleep(10)
+    puts "done sleeping"
   rescue StandardError => e
     puts "ERROR: #{e}"
-    errors++
+    errors += 1
     if errors > max_errors
       pins.each do |pin|
         io.write(pin, 1)
